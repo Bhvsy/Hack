@@ -1,0 +1,2738 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#FF4DA3">
+    <title>SHIYA - Find Details in Seconds</title>
+    
+    <style>
+/* Pink, Black, & White Theme - iOS Premium Feel */
+:root {
+    /* Light Theme (Pink & White) */
+    --accent-pink: #FF4DA3;
+    --accent-pink-soft: #ff85c0;
+    --accent-pink-glow: rgba(255, 77, 163, 0.3);
+    --bg-main: #FFF5F8;
+    --bg-secondary: #FFEDF5;
+    --card-bg: #FFFFFF;
+    --text-primary: #1D1D1F;
+    --text-muted: #86868B;
+    --border-color: rgba(0, 0, 0, 0.05);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --shadow-ios: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] {
+    /* Dark Theme (Pink & Black) */
+    --bg-main: #000000;
+    --bg-secondary: #0A0A0B;
+    --card-bg: #151516;
+    --text-primary: #FFFFFF;
+    --text-muted: #94949C;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --glass-bg: rgba(21, 21, 22, 0.8);
+    --shadow-ios: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.scroll-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1rem;
+    padding-bottom: 5rem; /* Space for nav */
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Bulletproof Native Scrolling for Admin Panel */
+html.admin-layout, 
+body.admin-layout {
+    height: auto !important;
+    overflow-y: auto !important;
+    display: block !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+body.admin-layout #app-container {
+    height: auto !important;
+    display: block !important;
+    overflow: visible !important;
+}
+
+body.admin-layout .scroll-container {
+    height: auto !important;
+    overflow-y: visible !important;
+    min-height: auto !important;
+    display: block !important;
+    flex: none !important;
+    padding-bottom: 5rem !important;
+}
+
+h1, h2, h3, .logo-n {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+}
+
+/* Screen Base */
+.screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    z-index: 10;
+    background: var(--bg-main);
+}
+
+.screen.active {
+    display: flex;
+    animation: iosFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes iosFadeIn {
+    from { opacity: 0; transform: scale(0.94) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Splash Screen */
+#splash-screen {
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    background: var(--bg-main);
+}
+
+.splash-content {
+    text-align: center;
+}
+
+.logo-morph {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 2rem;
+}
+
+.logo-inner {
+    width: 100%;
+    height: 100%;
+    background: var(--accent-pink);
+    border-radius: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 20px 40px var(--accent-pink-glow);
+}
+
+.logo-n {
+    color: white;
+    font-size: 4rem;
+    font-weight: 800;
+}
+
+.logo-icon {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    color: white;
+    width: 24px;
+    height: 24px;
+}
+
+.logo-glow {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--accent-pink);
+    filter: blur(40px);
+    opacity: 0.4;
+    border-radius: 32px;
+}
+
+.splash-title {
+    font-size: 2rem;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.splash-subtitle {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    font-weight: 500;
+    margin-bottom: 4rem;
+}
+
+.ios-loader {
+    width: 200px;
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 10px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.ios-loader-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--accent-pink);
+    border-radius: 10px;
+    animation: preloader 2.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes preloader {
+    0% { width: 0%; }
+    100% { width: 100%; }
+}
+
+/* Main Layout Styles */
+.ios-header {
+    padding: 1.5rem;
+    padding-top: 3.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg-main);
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: var(--bg-secondary);
+    padding: 0.5rem;
+    padding-right: 1.2rem;
+    border-radius: 100px;
+    border: 1px solid var(--border-color);
+}
+
+.profile-chip img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chip-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.chip-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.chip-status {
+    font-size: 0.7rem;
+    color: var(--accent-pink);
+    font-weight: 600;
+}
+
+.header-btns {
+    display: flex;
+    gap: 0.8rem;
+}
+
+.icon-btn-circle, .icon-btn-pill {
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.icon-btn-circle {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon-btn-pill {
+    padding: 0 1rem;
+    height: 45px;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dot-notify {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 8px;
+    height: 8px;
+    background: #FF3B30;
+    border-radius: 50%;
+    border: 2px solid var(--bg-secondary);
+}
+
+/* Dark Mode Logic */
+.sun-icon { display: none; }
+[data-theme="dark"] .moon-icon { display: none; }
+[data-theme="dark"] .sun-icon { display: block; }
+
+/* Stickers & Decorations */
+.sticker {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.15;
+    background: var(--accent-pink);
+    filter: blur(60px);
+}
+
+.sticker-1 { width: 300px; height: 300px; top: -100px; right: -50px; border-radius: 50%; }
+.sticker-2 { width: 250px; height: 250px; bottom: 100px; left: -100px; border-radius: 50%; }
+
+/* iOS Smooth Animations */
+.ios-card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-ios);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    will-change: transform, opacity;
+}
+
+.ios-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+}
+
+.ios-card:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease-out;
+}
+
+/* Result card entrance animation */
+.result-card {
+    border-left: 5px solid var(--accent-pink);
+    margin-top: 1.5rem;
+    animation: slideUpFade 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Smooth button transitions */
+.primary-btn-ios, .search-go-btn {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.primary-btn-ios::after, .search-go-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+}
+
+.primary-btn-ios:active::after, .search-go-btn:active::after {
+    width: 200%;
+    height: 200%;
+}
+
+/* Smooth input focus */
+.ios-input-group {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    border: 2px solid transparent;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.ios-input-group:focus-within {
+    border-color: var(--accent-pink);
+    background: var(--bg-main);
+    box-shadow: 0 4px 20px var(--accent-pink-glow);
+    transform: translateY(-1px);
+}
+
+/* Chat Container Scrolling */
+#chat-history,
+#admin-chat-history {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    max-height: calc(80vh - 150px);
+}
+
+/* Support Chat List Scrolling */
+#support-chat-list {
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+.ios-card {
+    background: var(--card-bg);
+    border-radius: 30px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-ios);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ios-card:active {
+    transform: scale(0.97);
+}
+
+.pink-gradient-card {
+    background: linear-gradient(135deg, var(--accent-pink) 0%, #ff1f8b 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.pink-gradient-card h3 {
+    font-size: 1.8rem;
+    line-height: 1.1;
+    max-width: 160px;
+    position: relative;
+    z-index: 5;
+}
+
+.card-deco {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+/* Search UI */
+.input-header {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin: 1.5rem 0 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ios-input-group {
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    border: 1.5px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ios-input-group:focus-within {
+    border-color: var(--accent-pink);
+    background: var(--bg-main);
+    box-shadow: 0 0 20px var(--accent-pink-glow);
+}
+
+.ios-input-group input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0.8rem;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.search-go-btn {
+    width: 44px;
+    height: 44px;
+    background: var(--accent-pink);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Bottom Nav */
+.ios-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 85px;
+    z-index: 100;
+}
+
+.nav-blur {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border-color);
+}
+
+.nav-links {
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 70px;
+    padding-top: 10px;
+}
+
+.nav-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-muted);
+    gap: 0.3rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-tab.active {
+    color: var(--accent-pink);
+    transform: translateY(-5px);
+}
+
+.nav-tab span {
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+
+/* Modal & Auth Styling */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    z-index: 2000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg-main);
+    position: relative;
+    padding: 3rem 1.5rem !important;
+    border-radius: 40px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+}
+
+/* Side Menu Styling */
+#side-menu-overlay {
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.side-menu-content {
+    width: 280px;
+    height: 100%;
+    background: var(--bg-main);
+    padding: 3rem 1.5rem;
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 10px 0 40px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+}
+
+#side-menu-overlay.active .side-menu-content {
+    transform: translateX(0);
+}
+
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.2rem 0;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: opacity 0.2s;
+}
+
+.menu-item:active {
+    opacity: 0.7;
+}
+
+.menu-item i {
+    color: var(--accent-pink);
+}
+
+.auth-view {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.auth-view.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.auth-view h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-family: 'Outfit', sans-serif;
+}
+
+.auth-view p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+}
+
+.auth-switch span {
+    color: var(--accent-pink);
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: var(--bg-secondary);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.ios-input-group i {
+    padding-left: 1.2rem;
+    color: var(--text-muted);
+    width: 20px;
+}
+
+/* Button Refinement */
+.primary-btn-ios, .search-go-btn, .icon-btn-circle, .icon-btn-pill, .edit-coins-btn {
+    cursor: pointer;
+}
+
+.primary-btn-ios {
+    width: 100%;
+    background: var(--accent-pink);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 1.3rem;
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 12px 30px var(--accent-pink-glow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.primary-btn-ios:active, .search-go-btn:active, .icon-btn-circle:active, .icon-btn-pill:active, .edit-coins-btn:active {
+    transform: scale(0.94);
+    opacity: 0.85;
+}
+
+/* Result Card */
+.result-card {
+    border-left: 6px solid var(--accent-pink);
+    margin-top: 1.5rem;
+}
+
+.res-label { font-size: 0.8rem; color: var(--accent-pink); font-weight: 800; display: block; margin-bottom: 1.2rem; }
+.res-row { 
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 0.75rem; 
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+.res-row:last-child {
+    border-bottom: none;
+}
+.res-key { 
+    color: var(--text-muted); 
+    font-size: 0.9rem; 
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.res-val { 
+    font-weight: 700; 
+    font-size: 0.95rem;
+    color: var(--text-main);
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
+}
+
+/* Utilities */
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }
+.text-muted { color: var(--text-muted); }
+
+/* Admin Row */
+.user-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem !important;
+}
+
+.edit-coins-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-pink);
+}
+
+.user-meta {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.hidden { display: none; }
+
+/* Tools Grid */
+.tools-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.tool-card {
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--border-color);
+}
+
+.tool-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.tool-card:active {
+    transform: scale(0.98);
+}
+
+.tool-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+.tool-icon i {
+    width: 28px;
+    height: 28px;
+}
+
+.tool-card h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    color: var(--text-primary);
+}
+
+.tool-card p {
+    font-size: 0.8rem;
+    margin: 0;
+}
+    </style>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Block popups and redirects
+        (function() {
+            // Store original methods
+            const originalWindowOpen = window.open;
+            const originalLocationAssign = window.location.assign;
+            const originalLocationHref = window.location.href;
+            
+            // Block window.open popups
+            window.open = function(url, target, features) {
+                console.log('Blocked popup:', url);
+                return null;
+            };
+            
+            // Block location changes
+            Object.defineProperty(window.location, 'href', {
+                set: function(url) {
+                    console.log('Blocked redirect:', url);
+                    return false;
+                }
+            });
+            
+            // Block document.location
+            Object.defineProperty(document, 'location', {
+                set: function(value) {
+                    console.log('Blocked document.location change');
+                    return false;
+                }
+            });
+            
+            // Remove any dynamically added popup/modal elements
+            const popupObserver = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1) { // Element node
+                            // Check for common popup/ad patterns
+                            if (node.tagName === 'DIV' || node.tagName === 'IFRAME') {
+                                const style = window.getComputedStyle(node);
+                                const zIndex = parseInt(style.zIndex) || 0;
+                                
+                                // Remove if it's a high z-index overlay (likely a popup)
+                                if (zIndex > 9999 || 
+                                    node.className.includes('popup') ||
+                                    node.className.includes('modal') ||
+                                    node.className.includes('overlay') ||
+                                    node.id.includes('popup') ||
+                                    node.id.includes('modal') ||
+                                    node.innerHTML.includes('Teen Patti') ||
+                                    node.innerHTML.includes('win') ||
+                                    node.innerHTML.includes('prize')) {
+                                    console.log('Blocked popup element');
+                                    node.remove();
+                                }
+                            }
+                        }
+                    });
+                });
+            });
+            
+            // Start observing
+            popupObserver.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+            
+            // Block click events that trigger popups
+            document.addEventListener('click', function(e) {
+                // Check if click target is from an ad script
+                const target = e.target;
+                if (target.closest('#adsterra-banner') || 
+                    target.closest('[id*="ad"]') ||
+                    target.closest('[class*="ad"]')) {
+                    // Allow clicks on our own ad containers
+                    return;
+                }
+            }, true);
+        })();
+    </script>
+</head>
+<body class="mobile-layout">
+    <div id="app-container">
+        <div id="auth-modal" class="modal-overlay">
+            <div class="modal-content ios-card animate-ios">
+                <div id="signup-view" class="auth-view">
+                    <h2>Join Us</h2>
+                    <p>Signup to get 50 bonus coins!</p>
+                    <div class="ios-input-group mt-1">
+                        <i data-lucide="user"></i>
+                        <input type="text" id="reg-name" placeholder="Full Name">
+                    </div>
+                    <div class="ios-input-group mt-1">
+                        <i data-lucide="phone"></i>
+                        <input type="text" id="reg-phone" placeholder="Phone Number">
+                    </div>
+                    <div class="ios-input-group mt-1">
+                        <i data-lucide="mail"></i>
+                        <input type="email" id="reg-email" placeholder="Email Address">
+                    </div>
+                    <div class="ios-input-group mt-1">
+                        <i data-lucide="lock"></i>
+                        <input type="password" id="reg-pass" placeholder="Password">
+                    </div>
+                    <button class="primary-btn-ios mt-1" id="do-signup">Create Account</button>
+                    <p class="auth-switch">Already have an account? <span id="to-login">Login</span></p>
+                </div>
+
+                <div id="login-view" class="auth-view hidden">
+                    <h2>Welcome Back</h2>
+                    <div class="ios-input-group mt-1">
+                        <i data-lucide="mail"></i>
+                        <input type="email" id="login-email" placeholder="Email Address">
+                    </div>
+                    <div class="ios-input-group mt-1">
+                        <i data-lucide="lock"></i>
+                        <input type="password" id="login-pass" placeholder="Password">
+                    </div>
+                    <button class="primary-btn-ios mt-1" id="do-login">Sign In</button>
+                    <p class="auth-switch">Don't have an account? <span id="to-signup">Signup</span></p>
+                </div>
+                <button class="modal-close" id="close-auth">×</button>
+            </div>
+        </div>
+
+        <div id="payment-modal" class="modal-overlay">
+            <div class="modal-content ios-card animate-ios">
+                <div id="pay-step-1" class="auth-view">
+                    <h2>Buy Coins</h2>
+                    <p>Enter details to add credits</p>
+                    <div class="ios-input-group mt-1">
+                        <i data-lucide="user"></i>
+                        <input type="text" id="pay-name" placeholder="Full Name">
+                    </div>
+                    <div class="ios-input-group mt-1">
+                        <i data-lucide="phone"></i>
+                        <input type="text" id="pay-phone" placeholder="Contact Number">
+                    </div>
+                    <div class="ios-input-group mt-1">
+                        <i data-lucide="indian-rupee"></i>
+                        <input type="number" id="pay-amount" placeholder="Amount (INR)">
+                    </div>
+                    <button class="primary-btn-ios mt-1" id="btn-pay-next">Next</button>
+                    <p class="auth-switch text-muted" style="margin-top:1rem; font-size:0.8rem">Secure Payment Process</p>
+                </div>
+
+                <div id="pay-step-2" class="auth-view hidden" style="text-align: center;">
+                    <h2>Scan to Pay</h2>
+                    <p>Scan the code below and enter UTR</p>
+                    <div class="qr-container mt-1" style="position:relative; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                        <img src="https://ibb.co/PGd6YCQB"><img src="https://i.ibb.co/spnYmSq5/ranjeet.jpg" alt="Payment Scanner" id="qr-image" style="width: 200px; height: 200px; border-radius: 20px; border: 4px solid var(--accent-pink-soft); padding: 10px; background: white; box-shadow: 0 10px 30px var(--accent-pink-glow);">
+                        <div id="qr-fallback" style="display:none; width: 200px; height: 200px; border-radius: 20px; border: 2px dashed var(--accent-pink); flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 1rem; text-align: center;">
+                            <i data-lucide="image" style="width: 48px; height: 48px; color: var(--accent-pink);"></i>
+                            <span style="font-size:0.8rem; color:var(--text-muted)">QR code will load here.</span>
+                        </div>
+                    </div>
+                    <div class="ios-input-group mt-2">
+                        <i data-lucide="hash"></i>
+                        <input type="text" id="pay-utr" placeholder="Enter 12-digit UTR Number">
+                    </div>
+                    <button class="primary-btn-ios mt-1" id="btn-pay-submit">Submit Payment</button>
+                    <button class="menu-item text-muted" id="btn-pay-back" style="width: 100%; justify-content: center; background: transparent; border: none; margin-top: 1rem;"><i data-lucide="arrow-left"></i> Go Back</button>
+                </div>
+                <button class="modal-close" id="close-payment">×</button>
+            </div>
+        </div>
+
+        <div id="contact-modal" class="modal-overlay">
+            <div class="modal-content ios-card animate-ios" style="height: 80vh; max-height: 800px; display: flex; flex-direction: column; padding: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i data-lucide="message-circle" style="color:var(--accent-pink);"></i>
+                        <h2 style="margin:0; font-size:1.2rem;">Support Chat</h2>
+                    </div>
+                    <button class="icon-btn-circle" id="close-contact" style="width:30px; height:30px; box-shadow:none; background:transparent;"><i data-lucide="x" style="width:20px; height:20px;"></i></button>
+                </div>
+                
+                <div id="chat-history" class="scroll-container" style="flex: 1; overflow-y: auto; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                    <p class="text-muted" style="text-align:center; font-size:0.85rem; margin-top:1rem;">Welcome! Send us a message.</p>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; border-top: 1px solid var(--border-color); padding-top: 0.8rem;">
+                    <input type="text" id="contact-msg" placeholder="Type a message..." style="flex: 1; padding: 0.8rem 1rem; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); outline: none;">
+                    <button id="submit-contact" style="background: var(--accent-pink); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 10px var(--accent-pink-glow);">
+                        <i data-lucide="send" style="width: 18px; height: 18px; margin-left: -2px;"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="notifications-modal" class="modal-overlay">
+            <div class="modal-content ios-card animate-ios" style="max-height: 80vh; display: flex; flex-direction: column;">
+                <h2>Notifications</h2>
+                <div id="notifications-container" class="scroll-container" style="padding-left:0; padding-right:0; margin-top:1rem; overflow-y:auto; flex:1;">
+                    <p class="text-muted" style="text-align:center;">Loading...</p>
+                </div>
+                <button class="modal-close" id="close-notifications">×</button>
+            </div>
+        </div>
+
+        <div class="sticker sticker-1" aria-hidden="true"></div>
+        <div class="sticker sticker-2" aria-hidden="true"></div>
+
+        <div id="splash-screen" class="screen active">
+            <div class="splash-content">
+                <div class="logo-morph">
+                    <div class="logo-inner">
+                        <span class="logo-n">N</span>
+                        <i data-lucide="search" class="logo-icon"></i>
+                    </div>
+                    <div class="logo-glow"></div>
+                </div>
+                <h1 class="splash-title">SHIYA</h1>
+                <p class="splash-subtitle">FIND DETAILS IN SECONDS</p>
+                <div class="ios-loader">
+                    <div class="ios-loader-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="main-screen" class="screen">
+            <header class="ios-header">
+                <div class="header-top">
+                    <button class="icon-btn-circle" id="menu-btn" style="margin-right: 0.8rem; flex-shrink: 0;">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="profile-chip" style="flex-grow: 1;">
+                        <img src="https://i.pravatar.cc/150?u=rohan" alt="User" id="header-avatar">
+                        <div class="chip-text">
+                            <span class="chip-label">Hi, Rohan</span>
+                            <span class="chip-status">Premium User</span>
+                        </div>
+                    </div>
+                    <div class="header-btns">
+                        <button id="dark-mode-toggle" class="icon-btn-pill">
+                            <i data-lucide="moon" class="moon-icon"></i>
+                            <i data-lucide="sun" class="sun-icon"></i>
+                        </button>
+                        <button class="icon-btn-circle" id="notify-btn">
+                            <i data-lucide="bell"></i>
+                            <span class="dot-notify" id="notify-dot" style="display:none;"></span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <main id="app-content" class="scroll-container">
+                </main>
+
+            <nav class="ios-nav">
+                <div class="nav-blur"></div>
+                <div class="nav-links">
+                    <div class="nav-tab active" data-tab="home">
+                        <i data-lucide="layout-grid"></i>
+                        <span>Explore</span>
+                    </div>
+                    <div class="nav-tab" data-tab="search">
+                        <i data-lucide="search"></i>
+                        <span>Lookup</span>
+                    </div>
+                    <div class="nav-tab" data-tab="profile">
+                        <i data-lucide="user"></i>
+                        <span>Account</span>
+                    </div>
+                </div>
+            </nav>
+
+            </div>
+    </div>
+
+    <div id="side-menu-overlay" class="modal-overlay" style="justify-content: flex-start; padding: 0;">
+        <div id="side-menu" class="side-menu-content">
+            <div class="menu-header">
+                <h2>Menu</h2>
+                <button class="icon-btn-circle" id="close-menu-btn" style="background:transparent; border:none; box-shadow:none;"><i data-lucide="x"></i></button>
+            </div>
+            <div class="menu-links">
+                <a href="#" class="menu-item" id="menu-my-account"><i data-lucide="user"></i> My Account</a>
+                <a href="#" class="menu-item" id="menu-buy-coins"><i data-lucide="credit-card"></i> Buy Coins</a>
+                <a href="#" class="menu-item"><i data-lucide="clock"></i> Search History</a>
+                <a href="#" class="menu-item" id="menu-contact-us"><i data-lucide="message-circle"></i> Contact Us</a>
+                <a href="#" class="menu-item text-muted" id="menu-logout-btn" style="margin-top:2rem"><i data-lucide="log-out"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+var slowAES={aes:{keySize:{SIZE_128:16,SIZE_192:24,SIZE_256:32},sbox:[99,124,119,123,242,107,111,197,48,1,103,43,254,215,171,118,202,130,201,125,250,89,71,240,173,212,162,175,156,164,114,192,183,253,147,38,54,63,247,204,52,165,229,241,113,216,49,21,4,199,35,195,24,150,5,154,7,18,128,226,235,39,178,117,9,131,44,26,27,110,90,160,82,59,214,179,41,227,47,132,83,209,0,237,32,252,177,91,106,203,190,57,74,76,88,207,208,239,170,251,67,77,51,133,69,249,2,127,80,60,159,168,81,163,64,143,146,157,56,245,188,182,218,33,16,255,243,210,205,12,19,236,95,151,68,23,196,167,126,61,100,93,25,115,96,129,79,220,34,42,144,136,70,238,184,20,222,94,11,219,224,50,58,10,73,6,36,92,194,211,172,98,145,149,228,121,231,200,55,109,141,213,78,169,108,86,244,234,101,122,174,8,186,120,37,46,28,166,180,198,232,221,116,31,75,189,139,138,112,62,181,102,72,3,246,14,97,53,87,185,134,193,29,158,225,248,152,17,105,217,142,148,155,30,135,233,206,85,40,223,140,161,137,13,191,230,66,104,65,153,45,15,176,84,187,22],rsbox:[82,9,106,213,48,54,165,56,191,64,163,158,129,243,215,251,124,227,57,130,155,47,255,135,52,142,67,68,196,222,233,203,84,123,148,50,166,194,35,61,238,76,149,11,66,250,195,78,8,46,161,102,40,217,36,178,118,91,162,73,109,139,209,37,114,248,246,100,134,104,152,22,212,164,92,204,93,101,182,146,108,112,72,80,253,237,185,218,94,21,70,87,167,141,157,132,144,216,171,0,140,188,211,10,247,228,88,5,184,179,69,6,208,44,30,143,202,63,15,2,193,175,189,3,1,19,138,107,58,145,17,65,79,103,220,234,151,242,207,206,240,180,230,115,150,172,116,34,231,173,53,133,226,249,55,232,28,117,223,110,71,241,26,113,29,41,197,137,111,183,98,14,170,24,190,27,252,86,62,75,198,210,121,32,154,219,192,254,120,205,90,244,31,221,168,51,136,7,199,49,177,18,16,89,39,128,236,95,96,81,127,169,25,181,74,13,45,229,122,159,147,201,156,239,160,224,59,77,174,42,245,176,200,235,187,60,131,83,153,97,23,43,4,126,186,119,214,38,225,105,20,99,85,33,12,125],rotate:function(i){for(var t=i[0],r=0;r<3;r++)i[r]=i[r+1];return i[3]=t,i},Rcon:[141,1,2,4,8,16,32,64,128,27,54,108,216,171,77,154,47,94,188,99,198,151,53,106,212,179,125,250,239,197,145,57,114,228,211,189,97,194,159,37,74,148,51,102,204,131,29,58,116,232,203,141,1,2,4,8,16,32,64,128,27,54,108,216,171,77,154,47,94,188,99,198,151,53,106,212,179,125,250,239,197,145,57,114,228,211,189,97,194,159,37,74,148,51,102,204,131,29,58,116,232,203,141,1,2,4,8,16,32,64,128,27,54,108,216,171,77,154,47,94,188,99,198,151,53,106,212,179,125,250,239,197,145,57,114,228,211,189,97,194,159,37,74,148,51,102,204,131,29,58,116,232,203,141,1,2,4,8,16,32,64,128,27,54,108,216,171,77,154,47,94,188,99,198,151,53,106,212,179,125,250,239,197,145,57,114,228,211,189,97,194,159,37,74,148,51,102,204,131,29,58,116,232,203,141,1,2,4,8,16,32,64,128,27,54,108,216,171,77,154,47,94,188,99,198,151,53,106,212,179,125,250,239,197,145,57,114,228,211,189,97,194,159,37,74,148,51,102,204,131,29,58,116,232,203],G2X:[0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84,86,88,90,92,94,96,98,100,102,104,106,108,110,112,114,116,118,120,122,124,126,128,130,132,134,136,138,140,142,144,146,148,150,152,154,156,158,160,162,164,166,168,170,172,174,176,178,180,182,184,186,188,190,192,194,196,198,200,202,204,206,208,210,212,214,216,218,220,222,224,226,228,230,232,234,236,238,240,242,244,246,248,250,252,254,27,25,31,29,19,17,23,21,11,9,15,13,3,1,7,5,59,57,63,61,51,49,55,53,43,41,47,45,35,33,39,37,91,89,95,93,83,81,87,85,75,73,79,77,67,65,71,69,123,121,127,125,115,113,119,117,107,105,111,109,99,97,103,101,155,153,159,157,147,145,151,149,139,137,143,141,131,129,135,133,187,185,191,189,179,177,183,181,171,169,175,173,163,161,167,165,219,217,223,221,211,209,215,213,203,201,207,205,195,193,199,197,251,249,255,253,243,241,247,245,235,233,239,237,227,225,231,229],G3X:[0,3,6,5,12,15,10,9,24,27,30,29,20,23,18,17,48,51,54,53,60,63,58,57,40,43,46,45,36,39,34,33,96,99,102,101,108,111,106,105,120,123,126,125,116,119,114,113,80,83,86,85,92,95,90,89,72,75,78,77,68,71,66,65,192,195,198,197,204,207,202,201,216,219,222,221,212,215,210,209,240,243,246,245,252,255,250,249,232,235,238,237,228,231,226,225,160,163,166,165,172,175,170,169,184,187,190,189,180,183,178,177,144,147,150,149,156,159,154,153,136,139,142,141,132,135,130,129,155,152,157,158,151,148,145,146,131,128,133,134,143,140,137,138,171,168,173,174,167,164,161,162,179,176,181,182,191,188,185,186,251,248,253,254,247,244,241,242,227,224,229,230,239,236,233,234,203,200,205,206,199,196,193,194,211,208,213,214,223,220,217,218,91,88,93,94,87,84,81,82,67,64,69,70,79,76,73,74,107,104,109,110,103,100,97,98,115,112,117,118,127,124,121,122,59,56,61,62,55,52,49,50,35,32,37,38,47,44,41,42,11,8,13,14,7,4,1,2,19,16,21,22,31,28,25,26],G9X:[0,9,18,27,36,45,54,63,72,65,90,83,108,101,126,119,144,153,130,139,180,189,166,175,216,209,202,195,252,245,238,231,59,50,41,32,31,22,13,4,115,122,97,104,87,94,69,76,171,162,185,176,143,134,157,148,227,234,241,248,199,206,213,220,118,127,100,109,82,91,64,73,62,55,44,37,26,19,8,1,230,239,244,253,194,203,208,217,174,167,188,181,138,131,152,145,77,68,95,86,105,96,123,114,5,12,23,30,33,40,51,58,221,212,207,198,249,240,235,226,149,156,135,142,177,184,163,170,236,229,254,247,200,193,218,211,164,173,182,191,128,137,146,155,124,117,110,103,88,81,74,67,52,61,38,47,16,25,2,11,215,222,197,204,243,250,225,232,159,150,141,132,187,178,169,160,71,78,85,92,99,106,113,120,15,6,29,20,43,34,57,48,154,147,136,129,190,183,172,165,210,219,192,201,246,255,228,237,10,3,24,17,46,39,60,53,66,75,80,89,102,111,116,125,161,168,179,186,133,140,151,158,233,224,251,242,205,196,223,214,49,56,35,42,21,28,7,14,121,112,107,98,93,84,79,70],GBX:[0,11,22,29,44,39,58,49,88,83,78,69,116,127,98,105,176,187,166,173,156,151,138,129,232,227,254,245,196,207,210,217,123,112,109,102,87,92,65,74,35,40,53,62,15,4,25,18,203,192,221,214,231,236,241,250,147,152,133,142,191,180,169,162,246,253,224,235,218,209,204,199,174,165,184,179,130,137,148,159,70,77,80,91,106,97,124,119,30,21,8,3,50,57,36,47,141,134,155,144,161,170,183,188,213,222,195,200,249,242,239,228,61,54,43,32,17,26,7,12,101,110,115,120,73,66,95,84,247,252,225,234,219,208,205,198,175,164,185,178,131,136,149,158,71,76,81,90,107,96,125,118,31,20,9,2,51,56,37,46,140,135,154,145,160,171,182,189,212,223,194,201,248,243,238,229,60,55,42,33,16,27,6,13,100,111,114,121,72,67,94,85,1,10,23,28,45,38,59,48,89,82,79,68,117,126,99,104,177,186,167,172,157,150,139,128,233,226,255,244,197,206,211,216,122,113,108,103,86,93,64,75,34,41,52,63,14,5,24,19,202,193,220,215,230,237,240,251,146,153,132,143,190,181,168,163],GDX:[0,13,26,23,52,57,46,35,104,101,114,127,92,81,70,75,208,221,202,199,228,233,254,243,184,181,162,175,140,129,150,155,187,182,161,172,143,130,149,152,211,222,201,196,231,234,253,240,107,102,113,124,95,82,69,72,3,14,25,20,55,58,45,32,109,96,119,122,89,84,67,78,5,8,31,18,49,60,43,38,189,176,167,170,137,132,147,158,213,216,207,194,225,236,251,246,214,219,204,193,226,239,248,245,190,179,164,169,138,135,144,157,6,11,28,17,50,63,40,37,110,99,116,121,90,87,64,77,218,215,192,205,238,227,244,249,178,191,168,165,134,139,156,145,10,7,16,29,62,51,36,41,98,111,120,117,86,91,76,65,97,108,123,118,85,88,79,66,9,4,19,30,61,48,39,42,177,188,171,166,133,136,159,146,217,212,195,206,237,224,247,250,183,186,173,160,131,142,153,148,223,210,197,200,235,230,241,252,103,106,125,112,83,94,73,68,15,2,21,24,59,54,33,44,12,1,22,27,56,53,34,47,100,105,126,115,80,93,74,71,220,209,198,203,232,229,242,255,180,185,174,163,128,141,154,151],GEX:[0,14,28,18,56,54,36,42,112,126,108,98,72,70,84,90,224,238,252,242,216,214,196,202,144,158,140,130,168,166,180,186,219,213,199,201,227,237,255,241,171,165,183,185,147,157,143,129,59,53,39,41,3,13,31,17,75,69,87,89,115,125,111,97,173,163,177,191,149,155,137,135,221,211,193,207,229,235,249,247,77,67,81,95,117,123,105,103,61,51,33,47,5,11,25,23,118,120,106,100,78,64,82,92,6,8,26,20,62,48,34,44,150,152,138,132,174,160,178,188,230,232,250,244,222,208,194,204,65,79,93,83,121,119,101,107,49,63,45,35,9,7,21,27,161,175,189,179,153,151,133,139,209,223,205,195,233,231,245,251,154,148,134,136,162,172,190,176,234,228,246,248,210,220,206,192,122,116,102,104,66,76,94,80,10,4,22,24,50,60,46,32,236,226,240,254,212,218,200,198,156,146,128,142,164,170,184,182,12,2,16,30,52,58,40,38,124,114,96,110,68,74,88,86,55,57,43,37,15,1,19,29,71,73,91,85,127,113,99,109,215,217,203,197,239,225,243,253,167,169,187,181,159,145,131,141],core:function(i,t){i=this.rotate(i);for(var r=0;r<4;++r)i[r]=this.sbox[i[r]];return i[0]=i[0]^this.Rcon[t],i},expandKey:function(i,t){for(var r=16*(this.numberOfRounds(t)+1),o=0,n=1,s=[],e=[],a=0;a<r;a++)e[a]=0;for(var h=0;h<t;h++)e[h]=i[h];for(o+=t;o<r;){for(var u=0;u<4;u++)s[u]=e[o-4+u];if(o%t==0&&(s=this.core(s,n++)),t==this.keySize.SIZE_256&&o%t==16)for(var f=0;f<4;f++)s[f]=this.sbox[s[f]];for(var l=0;l<4;l++)e[o]=e[o-t]^s[l],o++}return e},addRoundKey:function(i,t){for(var r=0;r<16;r++)i[r]^=t[r];return i},createRoundKey:function(i,t){for(var r=[],o=0;o<4;o++)for(var n=0;n<4;n++)r[4*n+o]=i[t+4*o+n];return r},subBytes:function(i,t){for(var r=0;r<16;r++)i[r]=(t?this.rsbox:this.sbox)[i[r]];return i},shiftRows:function(i,t){for(var r=0;r<4;r++)i=this.shiftRow(i,4*r,r,t);return i},shiftRow:function(i,t,r,o){for(var n=0;n<r;n++)if(o){for(var s=i[t+3],e=3;0<e;e--)i[t+e]=i[t+e-1];i[t]=s}else{for(s=i[t],e=0;e<3;e++)i[t+e]=i[t+e+1];i[t+3]=s}return i},galois_multiplication:function(i,t){for(var r=0,o=0;o<8;o++){1==(1&t)&&(r^=i),256<r&&(r^=256);var n=128&i;256<(i<<=1)&&(i^=256),128==n&&(i^=27),256<i&&(i^=256),256<(t>>=1)&&(t^=256)}return r},mixColumns:function(i,t){for(var r=[],o=0;o<4;o++){for(var n=0;n<4;n++)r[n]=i[4*n+o];r=this.mixColumn(r,t);for(var s=0;s<4;s++)i[4*s+o]=r[s]}return i},mixColumn:function(i,t){for(var r=[],r=t?[14,9,13,11]:[2,1,1,3],o=[],n=0;n<4;n++)o[n]=i[n];return i[0]=this.galois_multiplication(o[0],r[0])^this.galois_multiplication(o[3],r[1])^this.galois_multiplication(o[2],r[2])^this.galois_multiplication(o[1],r[3]),i[1]=this.galois_multiplication(o[1],r[0])^this.galois_multiplication(o[0],r[1])^this.galois_multiplication(o[3],r[2])^this.galois_multiplication(o[2],r[3]),i[2]=this.galois_multiplication(o[2],r[0])^this.galois_multiplication(o[1],r[1])^this.galois_multiplication(o[0],r[2])^this.galois_multiplication(o[3],r[3]),i[3]=this.galois_multiplication(o[3],r[0])^this.galois_multiplication(o[2],r[1])^this.galois_multiplication(o[1],r[2])^this.galois_multiplication(o[0],r[3]),i},round:function(i,t){return i=this.subBytes(i,!1),i=this.shiftRows(i,!1),i=this.mixColumns(i,!1),i=this.addRoundKey(i,t)},invRound:function(i,t){return i=this.shiftRows(i,!0),i=this.subBytes(i,!0),i=this.addRoundKey(i,t),i=this.mixColumns(i,!0)},main:function(i,t,r){i=this.addRoundKey(i,this.createRoundKey(t,0));for(var o=1;o<r;o++)i=this.round(i,this.createRoundKey(t,16*o));return i=this.subBytes(i,!1),i=this.shiftRows(i,!1),i=this.addRoundKey(i,this.createRoundKey(t,16*r))},invMain:function(i,t,r){i=this.addRoundKey(i,this.createRoundKey(t,16*r));for(var o=r-1;0<o;o--)i=this.invRound(i,this.createRoundKey(t,16*o));return i=this.shiftRows(i,!0),i=this.subBytes(i,!0),i=this.addRoundKey(i,this.createRoundKey(t,0))},numberOfRounds:function(i){var t;switch(i){case this.keySize.SIZE_128:t=10;break;case this.keySize.SIZE_192:t=12;break;case this.keySize.SIZE_256:t=14;break;default:return null}return t},encrypt:function(i,t,r){for(var o=[],n=[],s=this.numberOfRounds(r),e=0;e<4;e++)for(var a=0;a<4;a++)n[e+4*a]=i[4*e+a];for(var r=this.expandKey(t,r),n=this.main(n,r,s),h=0;h<4;h++)for(var u=0;u<4;u++)o[4*h+u]=n[h+4*u];return o},decrypt:function(i,t,r){for(var o=[],n=[],s=this.numberOfRounds(r),e=0;e<4;e++)for(var a=0;a<4;a++)n[e+4*a]=i[4*e+a];for(var r=this.expandKey(t,r),n=this.invMain(n,r,s),h=0;h<4;h++)for(var u=0;u<4;u++)o[4*h+u]=n[h+4*u];return o}},modeOfOperation:{OFB:0,CFB:1,CBC:2},getBlock:function(i,t,r,o){return 16<r-t&&(r=t+16),i.slice(t,r)},encrypt:function(i,t,r,o){var n=r.length;if(o.length%16)throw"iv length must be 128 bits.";var s,e=[],a=[],h=[],u=[],f=!0;if(t==this.modeOfOperation.CBC&&this.padBytesIn(i),null!==i)for(var l=0;l<Math.ceil(i.length/16);l++){var c=16*l,d=16*l+16;if(16*l+16>i.length&&(d=i.length),s=this.getBlock(i,c,d,t),t==this.modeOfOperation.CFB){f?(a=this.aes.encrypt(o,r,n),f=!1):a=this.aes.encrypt(e,r,n);for(var p=0;p<16;p++)h[p]=s[p]^a[p];for(var v=0;v<d-c;v++)u.push(h[v]);e=h}else if(t==this.modeOfOperation.OFB){f?(a=this.aes.encrypt(o,r,n),f=!1):a=this.aes.encrypt(e,r,n);for(p=0;p<16;p++)h[p]=s[p]^a[p];for(v=0;v<d-c;v++)u.push(h[v]);e=a}else if(t==this.modeOfOperation.CBC){for(p=0;p<16;p++)e[p]=s[p]^(f?o:h)[p];f=!1,h=this.aes.encrypt(e,r,n);for(v=0;v<16;v++)u.push(h[v])}}return u},decrypt:function(t,r,o,n){var s=o.length;if(n.length%16)throw"iv length must be 128 bits.";var e,a=[],h=[],u=[],f=[],l=!0;if(null!==t){for(var c=0;c<Math.ceil(t.length/16);c++){var d=16*c,p=16*c+16;if(16*c+16>t.length&&(p=t.length),e=this.getBlock(t,d,p,r),r==this.modeOfOperation.CFB){for(l?(h=this.aes.encrypt(n,o,s),l=!1):h=this.aes.encrypt(a,o,s),i=0;i<16;i++)u[i]=h[i]^e[i];for(var v=0;v<p-d;v++)f.push(u[v]);a=e}else if(r==this.modeOfOperation.OFB){for(l?(h=this.aes.encrypt(n,o,s),l=!1):h=this.aes.encrypt(a,o,s),i=0;i<16;i++)u[i]=h[i]^e[i];for(v=0;v<p-d;v++)f.push(u[v]);a=h}else if(r==this.modeOfOperation.CBC){for(h=this.aes.decrypt(e,o,s),i=0;i<16;i++)u[i]=(l?n:a)[i]^h[i];l=!1;for(v=0;v<p-d;v++)f.push(u[v]);a=e}}r==this.modeOfOperation.CBC&&this.unpadBytesOut(f)}return f},padBytesIn:function(i){for(var t=16-i.length%16,r=0;r<t;r++)i.push(t)},unpadBytesOut:function(i){var t=0,r=-1;if(16<i.length){for(var o=i.length-1;o>=i.length-1-16&&i[o]<=16;o--){if(-1==r&&(r=i[o]),i[o]!=r){t=0;break}if(++t==r)break}0<t&&i.splice(i.length-t,t)}}};
+    </script>
+    
+    <script>
+// Supabase Configuration
+const SUPABASE_URL = 'https://wsunusjsogmkuaxlqrfa.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzdW51c2pzb2dta3VheGxxcmZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MDcyODgsImV4cCI6MjA4OTM4MzI4OH0.5HlpcsNliZpca8uh5RhJGECeciCyJfJZ8rZy8RWLhZA';
+
+let sb = null;
+if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
+
+// App State
+const state = {
+    currentTab: 'home',
+    anonCredits: isNaN(parseInt(localStorage.getItem('anon_credits'))) ? 50 : parseInt(localStorage.getItem('anon_credits')),
+    user: null,
+    profile: null,
+    theme: localStorage.getItem('theme') || 'light',
+    forcedAuthDismissed: false
+};
+
+// Initialize Anon Credits
+if (localStorage.getItem('anon_credits') === null || isNaN(parseInt(localStorage.getItem('anon_credits')))) {
+    localStorage.setItem('anon_credits', 50);
+    state.anonCredits = 50;
+}
+
+// Apply theme
+document.documentElement.setAttribute('data-theme', state.theme);
+lucide.createIcons();
+
+// Elements
+const splashScreen = document.getElementById('splash-screen');
+const mainScreen = document.getElementById('main-screen');
+const appContent = document.getElementById('app-content');
+const navTabs = document.querySelectorAll('.nav-tab');
+const darkModeBtn = document.getElementById('dark-mode-toggle');
+const authModal = document.getElementById('auth-modal');
+const signupView = document.getElementById('signup-view');
+const loginView = document.getElementById('login-view');
+const paymentModal = document.getElementById('payment-modal');
+const payStep1 = document.getElementById('pay-step-1');
+const payStep2 = document.getElementById('pay-step-2');
+
+// --- Payment UI Logic ---
+function openPaymentModal() {
+    if (!state.user) {
+        alert("Please login or signup first to buy coins.");
+        return showAuth('login');
+    }
+    paymentModal.classList.add('active');
+    payStep1.classList.remove('hidden');
+    payStep2.classList.add('hidden');
+    payStep1.style.opacity = '1';
+    
+    // Pre-fill if profile exists
+    if (state.profile) {
+        document.getElementById('pay-name').value = state.profile.full_name || '';
+        document.getElementById('pay-phone').value = state.profile.phone || '';
+    }
+}
+
+document.getElementById('close-payment').onclick = () => {
+    paymentModal.classList.remove('active');
+};
+
+document.getElementById('btn-pay-next').onclick = () => {
+    const name = document.getElementById('pay-name').value;
+    const phone = document.getElementById('pay-phone').value;
+    const amount = document.getElementById('pay-amount').value;
+
+    if (!name || !phone || !amount || amount <= 0) {
+        return alert("Please fill all details correctly.");
+    }
+
+    payStep1.style.opacity = '0';
+    setTimeout(() => {
+        payStep1.classList.add('hidden');
+        payStep2.classList.remove('hidden');
+        payStep2.style.opacity = '1';
+    }, 300);
+};
+
+document.getElementById('btn-pay-back').onclick = () => {
+    payStep2.style.opacity = '0';
+    setTimeout(() => {
+        payStep2.classList.add('hidden');
+        payStep1.classList.remove('hidden');
+        payStep1.style.opacity = '1';
+    }, 300);
+};
+
+document.getElementById('btn-pay-submit').onclick = async () => {
+    const utr = document.getElementById('pay-utr').value;
+    if (!utr || utr.length < 8) {
+        return alert("Please enter a valid UTR number.");
+    }
+
+    const btn = document.getElementById('btn-pay-submit');
+    btn.innerHTML = 'Submitting...';
+    btn.disabled = true;
+
+    if (sb && state.user) {
+        const name = document.getElementById('pay-name').value;
+        const phone = document.getElementById('pay-phone').value;
+        const amount = document.getElementById('pay-amount').value;
+
+        const { error } = await sb.from('payment_requests').insert([{
+            user_id: state.user.id,
+            full_name: name,
+            phone: phone,
+            email: state.user.email,
+            amount: amount,
+            utr_number: utr,
+            status: 'pending'
+        }]);
+
+        if (error) {
+            console.error(error);
+            alert("Error: " + error.message + "\n\nTip: Did you run the SQL code in Supabase? Is the 'payment_requests' table created?");
+        } else {
+            alert("Payment request submitted! Admin will verify and add coins shortly.");
+            paymentModal.classList.remove('active');
+        }
+    } else {
+        alert("Server error. Not connected.");
+    }
+
+    btn.innerHTML = 'Submit Payment';
+    btn.disabled = false;
+};
+
+// --- Auth UI Logic ---
+document.getElementById('to-login').onclick = () => {
+    signupView.style.opacity = '0';
+    signupView.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        signupView.classList.add('hidden');
+        loginView.classList.remove('hidden');
+        setTimeout(() => {
+            loginView.style.opacity = '1';
+            loginView.style.transform = 'scale(1)';
+        }, 50);
+    }, 300);
+};
+
+document.getElementById('to-signup').onclick = () => {
+    loginView.style.opacity = '0';
+    loginView.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        loginView.classList.add('hidden');
+        signupView.classList.remove('hidden');
+        setTimeout(() => {
+            signupView.style.opacity = '1';
+            signupView.style.transform = 'scale(1)';
+        }, 50);
+    }, 300);
+};
+
+document.getElementById('close-auth').onclick = () => {
+    if (state.user || state.forcedAuthDismissed) {
+        authModal.classList.remove('active');
+    } else {
+        alert("Account required to continue.");
+    }
+};
+
+function showAuth(view = 'signup', forced = false) {
+    authModal.classList.add('active');
+    const closeBtn = document.getElementById('close-auth');
+    closeBtn.style.display = (forced && !state.user) ? 'none' : 'flex';
+
+    if(view === 'login') {
+        signupView.classList.add('hidden');
+        loginView.classList.remove('hidden');
+        loginView.style.opacity = '1';
+        loginView.style.transform = 'scale(1)';
+    } else {
+        loginView.classList.add('hidden');
+        signupView.classList.remove('hidden');
+        signupView.style.opacity = '1';
+        signupView.style.transform = 'scale(1)';
+    }
+    lucide.createIcons();
+}
+
+// --- Supabase & Logic ---
+// Gmail-only and temp mail blocker
+function isValidEmail(email) {
+    // Must be Gmail
+    if (!email.endsWith('@gmail.com')) {
+        return { valid: false, message: "Only Gmail addresses are allowed (@gmail.com)" };
+    }
+    
+    // Block known temp mail domains
+    const tempMailDomains = [
+        'tempmail.com', 'temp-mail.com', 'fakeemail.com', 'throwawaymail.com',
+        'yopmail.com', 'guerrillamail.com', 'sharklasers.com', 'mailinator.com',
+        'dispostable.com', 'tempinbox.com', 'mailnesia.com', 'tempmailaddress.com',
+        'burnermail.io', 'tempail.com', 'tmpmail.org', 'temp-mail.org',
+        'mailtemp.com', 'tempmail.ninja', 'tempmailo.com', 'tempmaili.com',
+        '10minutemail.com', '10minute.email', 'temp-mail.io', 'tmpemails.com',
+        'tempmail.gg', 'tempmail.plus', 'tempmail.net', 'tempmails.com',
+        'tempmailo.com', 'tempinbox.com', 'cryptogmail.com', ' disposable.email',
+        'disposablemail.com', 'trashmail.com', 'throwaway.email', 'tempmail.email'
+    ];
+    
+    const domain = email.split('@')[1];
+    if (tempMailDomains.includes(domain) || domain.includes('temp') || domain.includes('tmp') || domain.includes('fake') || domain.includes('throw') || domain.includes('disposable')) {
+        return { valid: false, message: "Temp mail / disposable email addresses are not allowed. Please use a real Gmail account." };
+    }
+    
+    // Gmail format validation
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!gmailRegex.test(email)) {
+        return { valid: false, message: "Please enter a valid Gmail address" };
+    }
+    
+    return { valid: true };
+}
+
+async function handleSignup() {
+    const name = document.getElementById('reg-name').value;
+    const phone = document.getElementById('reg-phone').value;
+    const email = document.getElementById('reg-email').value;
+    const pass = document.getElementById('reg-pass').value;
+
+    if(!name || !phone || !email || !pass) return alert("Please fill all fields");
+    
+    // Validate email - Gmail only
+    const emailCheck = isValidEmail(email);
+    if (!emailCheck.valid) {
+        return alert(emailCheck.message);
+    }
+
+    if (sb) {
+        const { data: authData, error: authError } = await sb.auth.signUp({
+            email: email, 
+            password: pass, 
+            options: { data: { full_name: name, phone: phone } }
+        });
+
+        if(authError) return alert("Signup Error: " + authError.message);
+
+        console.log("Auth signup result:", authData);
+        
+        if (!authData || !authData.user) {
+            return alert("Signup was successful, but no user was returned. Please check if 'Confirm Email' is enabled in your Supabase Auth settings. If it is, you must confirm your email before the profile can be created.");
+        }
+
+        const bonus = 50;
+        const initialTotal = (state.anonCredits || 0) + bonus;
+
+        const { error: profError } = await sb.from('profiles').upsert({ 
+            id: authData.user.id, 
+            full_name: name, 
+            phone: phone, 
+            credits: initialTotal, 
+            email: email 
+        }, { onConflict: 'id' });
+
+        if (profError) {
+            console.error("Profile creation error details:", profError);
+            return alert("Error saving profile: [" + profError.code + "] " + profError.message + "\n\nTip: Does the 'profiles' table have 'email' and 'phone' columns configured?");
+        }
+    }
+    
+    alert("Account created! Please login now.");
+    showAuth('login');
+}
+
+async function handleLogin() {
+    const email = document.getElementById('login-email').value;
+    const pass = document.getElementById('login-pass').value;
+
+    if (sb) {
+        const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+        if(error) return alert(error.message);
+    }
+    
+    state.forcedAuthDismissed = true;
+    authModal.classList.remove('active');
+    checkUser();
+}
+
+async function checkUser() {
+    if (!sb) { renderTab(); return; }
+    const { data: { user } } = await sb.auth.getUser();
+    state.user = user;
+    if(user) {
+        const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+        state.profile = profile;
+    }
+    renderTab();
+    checkNotifications();
+}
+
+async function checkNotifications() {
+    if (!sb) return;
+    
+    const { data: notifications, error } = await sb.from('notifications')
+        .select('*')
+        .order('id', { ascending: false })
+        .limit(1);
+
+    if (error) {
+        console.error("Failed to fetch notifications:", error);
+        return;
+    }
+
+    if (notifications && notifications.length > 0) {
+        const notif = notifications[0];
+        const lastSeenId = localStorage.getItem('last_notification_id');
+        
+        // Show only if this is a new notification code
+        if (lastSeenId === String(notif.id)) return;
+
+        // Ensure notification modal exists, if not inject it
+        let notifyModal = document.getElementById('global-notify-modal');
+        if (!notifyModal) {
+            notifyModal = document.createElement('div');
+            notifyModal.id = 'global-notify-modal';
+            notifyModal.className = 'modal-overlay';
+            notifyModal.innerHTML = `
+                <div class="modal-content ios-card animate-ios" style="text-align:center">
+                    <div style="width:50px; height:50px; background:var(--bg-secondary); border-radius:15px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;">
+                        <i data-lucide="bell" style="color:var(--accent-pink);"></i>
+                    </div>
+                    <h2>Important Update</h2>
+                    <p id="global-notify-msg" class="mt-1" style="font-size:1rem; line-height:1.5; color:var(--text-primary);"></p>
+                    <button class="primary-btn-ios mt-2" id="close-global-notify">Got it</button>
+                </div>
+            `;
+            document.body.appendChild(notifyModal);
+            
+            document.getElementById('close-global-notify').onclick = () => {
+                notifyModal.classList.remove('active');
+                localStorage.setItem('last_notification_id', notif.id);
+            };
+        }
+        
+        document.getElementById('global-notify-msg').innerText = notif.message;
+        notifyModal.classList.add('active');
+        lucide.createIcons();
+    }
+}
+
+// --- Navigation & Menu ---
+const menuBtn = document.getElementById('menu-btn');
+const closeMenuBtn = document.getElementById('close-menu-btn');
+const sideMenuOverlay = document.getElementById('side-menu-overlay');
+
+if (menuBtn) {
+    menuBtn.onclick = () => {
+        sideMenuOverlay.classList.add('active');
+        lucide.createIcons();
+    };
+}
+if (closeMenuBtn) {
+    closeMenuBtn.onclick = closeMenu;
+}
+
+function closeMenu() {
+    if (sideMenuOverlay) sideMenuOverlay.classList.remove('active');
+}
+
+const logoutBtn = document.getElementById('menu-logout-btn');
+if(logoutBtn) {
+    logoutBtn.onclick = async () => {
+        if (sb) { await sb.auth.signOut(); }
+        state.user = null;
+        state.profile = null;
+        state.forcedAuthDismissed = false;
+        closeMenu();
+        checkUser();
+        alert("Logged out successfully");
+    };
+}
+
+navTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const target = tab.getAttribute('data-tab');
+        if(state.currentTab === target) return;
+        appContent.style.opacity = '0';
+        appContent.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            state.currentTab = target;
+            navTabs.forEach(t => t.classList.toggle('active', t.getAttribute('data-tab') === target));
+            renderTab();
+            appContent.style.opacity = '1';
+            appContent.style.transform = 'translateY(0)';
+        }, 300);
+    });
+});
+
+function renderTab() {
+    let credits = state.profile ? state.profile.credits : state.anonCredits;
+    if (isNaN(credits)) credits = 0;
+
+    const sideLogoutBtn = document.getElementById('menu-logout-btn');
+    if (sideLogoutBtn) {
+        sideLogoutBtn.style.display = state.user ? 'flex' : 'none';
+    }
+
+    const name = state.profile ? state.profile.full_name : 'Guest';
+    const status = state.profile ? 'Premium User' : 'Free Trial';
+    
+    const chipLabel = document.querySelector('.chip-label');
+    const chipStatus = document.querySelector('.chip-status');
+    const headerAvatar = document.getElementById('header-avatar');
+
+    if(chipLabel) chipLabel.innerText = 'Hi, ' + name.split(' ')[0];
+    if(chipStatus) chipStatus.innerText = status;
+    if(headerAvatar) headerAvatar.src = `https://i.pravatar.cc/150?u=${state.user ? state.user.id : 'anon'}`;
+    
+    switch(state.currentTab) {
+        case 'home':
+            appContent.innerHTML = `
+                <div class="tab-view animate-ios">
+                    <div class="ios-card stat-box" style="margin-bottom: 1.5rem;">
+                        <h4 style="font-size:2rem">${credits}</h4>
+                        <span style="font-weight:600; color:var(--accent-pink)">COINS AVAILABLE</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <p class="text-muted" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; margin:0;">Choose Category</p>
+                    </div>
+                    <div class="tools-grid">
+                        <div class="tool-card" onclick="showTool('phone')">
+                            <div class="tool-icon" style="background:#FFE4EC;">
+                                <i data-lucide="phone" style="color:#FF4DA3;"></i>
+                            </div>
+                            <h4>Phone Tracker</h4>
+                            <p class="text-muted">Real-time Location</p>
+                        </div>
+                        <div class="tool-card" onclick="showTool('email')">
+                            <div class="tool-icon" style="background:#FFF3E0;">
+                                <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; fill: #FF6B35;">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                                </svg>
+                            </div>
+                            <h4>Aadhar Family Info</h4>
+                            <p class="text-muted">Family Details</p>
+                        </div>
+                        <div class="tool-card" onclick="showTool('social')">
+                            <div class="tool-icon" style="background:#FFE5E5;">
+                                <i data-lucide="car" style="color:#FF3B30;"></i>
+                            </div>
+                            <h4>Vehicle Information</h4>
+                            <p class="text-muted">RC Details Lookup</p>
+                        </div>
+                        <div class="tool-card" onclick="showTool('report')">
+                            <div class="tool-icon" style="background:#ECFDF5;">
+                                <i data-lucide="file-text" style="color:#10B981;"></i>
+                            </div>
+                            <h4>Full Report</h4>
+                            <p class="text-muted">PDF Export</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            break;
+        case 'search':
+            appContent.innerHTML = `
+                <div class="tab-view animate-ios">
+                    <h2 class="auth-view" style="font-size:2rem">Lookup</h2>
+                    <div class="ios-card" style="margin-top:2rem">
+                        <div class="ios-input-group">
+                            <i data-lucide="phone"></i>
+                            <input type="number" placeholder="Enter number..." id="lookup-field">
+                        </div>
+                        <button class="primary-btn-ios" id="lookup-btn">Search Now</button>
+                    </div>
+                    <div id="results-area"></div>
+                </div>
+            `;
+            document.getElementById('lookup-btn').onclick = performLookup;
+            break;
+        case 'profile':
+            const authButton = state.user 
+                ? ``  // Removed logout button/login button from Account view as requested. It's now only in side menu.
+                : `<button class="ios-card animate-ios" style="width:100%; text-align:center; color:var(--accent-pink); font-weight:600; margin-top:1rem; background:var(--bg-secondary); border:none; cursor:pointer;" onclick="showAuth('login')">Sign In / Sign Up</button>`;
+
+            appContent.innerHTML = `
+                <div class="tab-view animate-ios">
+                    <div class="ios-card">
+                        <div style="display:flex; align-items:center; gap:1.5rem">
+                            <img src="https://i.pravatar.cc/150?u=${state.user ? state.user.id : 'anon'}" style="width:70px; height:70px; border-radius:24px">
+                            <div>
+                                <h3 style="margin-bottom:0.2rem">${state.profile ? (state.profile.full_name || 'User') : 'Guest User'}</h3>
+                                <p class="text-muted"><i data-lucide="mail" style="width:14px; height:14px; vertical-align:middle;"></i> ${state.profile ? (state.profile.email || state.user.email) : 'Login to save progress'}</p>
+                                ${state.profile && state.profile.phone ? `<p class="text-muted" style="margin-top:0.2rem"><i data-lucide="phone" style="width:14px; height:14px; vertical-align:middle;"></i> ${state.profile.phone}</p>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ios-card pink-gradient-card" style="margin-top:1rem;">
+                        <h2 style="font-size:2.5rem">${credits} <span style="font-size:1rem; opacity:0.8">Coins</span></h2>
+                        <button class="primary-btn-ios" style="background:white; color:var(--accent-pink); margin-top:1rem" onclick="openPaymentModal()">BUY COINS</button>
+                    </div>
+                    ${authButton}
+                </div>
+            `;
+            break;
+    }
+    lucide.createIcons();
+}
+
+async function deductCredit() {
+    if(state.profile && sb) {
+        let current = state.profile.credits || 0;
+        if (isNaN(current)) current = 0;
+        const newTotal = Math.max(0, current - 50); // Deduct 50 coins per search
+        const { error } = await sb.from('profiles').update({ credits: newTotal }).eq('id', state.user.id);
+        if(!error) state.profile.credits = newTotal;
+    } else {
+        if (isNaN(state.anonCredits)) state.anonCredits = 0;
+        state.anonCredits = Math.max(0, state.anonCredits - 50); // Deduct 50 coins per search
+        localStorage.setItem('anon_credits', state.anonCredits);
+    }
+    renderTab();
+}
+
+async function performLookup() {
+    const credits = state.profile ? state.profile.credits : state.anonCredits;
+    const isAnon = !state.user;
+
+    if (credits < 50) {
+        if (isAnon) {
+            alert("You need 50 coins to search. Please sign up to get coins.");
+            showAuth('signup', false);
+        } else {
+            alert("You need 50 coins to search. Please buy more coins.");
+            state.currentTab = 'profile'; 
+            renderTab();
+        }
+        return;
+    }
+
+    const num = document.getElementById('lookup-field').value;
+    if(!num) {
+        console.log('No number entered');
+        return;
+    }
+
+    const btn = document.getElementById('lookup-btn');
+    btn.innerHTML = 'Searching...';
+    btn.disabled = true;
+
+    // Get or create results area - insert into app-content which is always visible
+    const appContent = document.getElementById('app-content');
+    let resultsArea = document.getElementById('results-area');
+    
+    if (resultsArea) {
+        resultsArea.remove(); // Remove old one
+    }
+    
+    resultsArea = document.createElement('div');
+    resultsArea.id = 'results-area';
+    resultsArea.style.marginTop = '1rem';
+    resultsArea.style.display = 'block';
+    resultsArea.style.width = '100%';
+    resultsArea.style.visibility = 'visible';
+    resultsArea.style.opacity = '1';
+    resultsArea.style.position = 'relative';
+    resultsArea.style.zIndex = '1000';
+    
+    // Insert at the end of app-content
+    if (appContent) {
+        appContent.appendChild(resultsArea);
+    } else {
+        // Fallback to body if app-content not found
+        document.body.appendChild(resultsArea);
+    }
+    
+    // Show loading message
+    resultsArea.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: var(--text-muted); background: white; border-radius: 16px; border: 2px solid #ff2d85;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">⏳</div>
+            <p style="font-weight: 600; color: #ff2d85;">Fetching information...</p>
+            <p style="font-size: 0.8rem; margin-top: 0.5rem;">Please wait</p>
+        </div>
+    `;
+
+    console.log('Starting phone lookup for:', num);
+
+    try {
+        const apiUrl = `api-proxy.php?type=phone&num=${num}`;
+        console.log('API URL:', apiUrl);
+        
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        console.log('Response status:', response.status);
+        
+        console.log('API response status:', response.status, response.ok);
+        
+        const data = await response.json().catch((e) => {
+            console.error('Failed to parse JSON:', e);
+            return {};
+        });
+        console.log('Full API Response:', JSON.stringify(data, null, 2));
+        
+        // Check for data in various formats
+        const hasData = data.data || data.result || data.records || data.info || data.results || (typeof data === 'object' && Object.keys(data).length > 0);
+        const isSuccess = data.status === 'success' || data.success === true || data.status === true || data.status === 'OK' || hasData;
+        
+        console.log('Has data:', hasData, 'Is success:', isSuccess);
+
+        if (isSuccess && hasData) {
+            // Deduct credit
+            await deductCredit();
+            
+            // Display results inline instead of redirecting
+            try {
+                displayResults(data, num, 'phone');
+            } catch (e) {
+                console.error('displayResults failed:', e);
+                // Fallback: show raw data
+                resultsArea.innerHTML = `
+                    <div class="ios-card" style="margin-top: 1rem; padding: 1rem; border: 2px solid #ff2d85;">
+                        <h3 style="color: #ff2d85; margin-bottom: 1rem;">📱 Phone Search Results</h3>
+                        <pre style="background: #f5f5f5; padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.8rem;">${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            }
+            return;
+        } else {
+            console.error('API Error - No data:', data);
+            // Show raw data for debugging
+            const rawData = JSON.stringify(data, null, 2);
+            const errorMsg = data.message || data.error || 'No results found for this number.';
+            
+            const activeTab = document.querySelector('.tab-view.active');
+            console.log('Error case - Active tab:', activeTab);
+            let resultsArea = activeTab ? activeTab.querySelector('#results-area') : null;
+            console.log('Error case - Results area:', resultsArea);
+            
+            if (!resultsArea && activeTab) {
+                resultsArea = document.createElement('div');
+                resultsArea.id = 'results-area';
+                resultsArea.style.marginTop = '1rem';
+                
+                const inputCards = activeTab.querySelectorAll('.ios-card');
+                if (inputCards.length > 0) {
+                    const lastInputCard = inputCards[inputCards.length - 1];
+                    lastInputCard.parentNode.insertBefore(resultsArea, lastInputCard.nextSibling);
+                } else {
+                    activeTab.appendChild(resultsArea);
+                }
+            }
+            
+            if (resultsArea) {
+                resultsArea.innerHTML = `
+                    <div class="ios-card result-card animate-ios" style="margin-top: 2rem;">
+                        <div style="text-align: center; color: var(--text-muted);">
+                            <i data-lucide="search-x" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
+                            <p>No results found</p>
+                            <p style="font-size: 0.8rem; margin-top: 0.5rem;">${errorMsg}</p>
+                            <details style="margin-top: 1rem; text-align: left;">
+                                <summary style="cursor: pointer; color: var(--accent-pink);">Debug Info</summary>
+                                <pre style="font-size: 0.7rem; overflow: auto; background: var(--bg-secondary); padding: 0.5rem; border-radius: 8px; margin-top: 0.5rem;">${rawData}</pre>
+                            </details>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+            }
+        }
+    } catch (error) {
+        console.error('Search Error:', error);
+        // Show error message
+        const activeTab = document.querySelector('.tab-view.active');
+        if (activeTab) {
+            let resultsArea = activeTab.querySelector('#results-area') || document.createElement('div');
+            resultsArea.id = 'results-area';
+            resultsArea.style.marginTop = '1rem';
+            activeTab.appendChild(resultsArea);
+            resultsArea.innerHTML = `
+                <div class="ios-card result-card animate-ios" style="margin-top: 2rem; border-left: 4px solid #ff3b30;">
+                    <div style="text-align: center; color: var(--text-muted);">
+                        <i data-lucide="alert-circle" style="width: 48px; height: 48px; color: #ff3b30; margin-bottom: 1rem;"></i>
+                        <p style="color: var(--text-main); font-weight: 600;">Error Occurred</p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">${error.message || 'Failed to fetch data'}</p>
+                        <button onclick="performLookup()" style="margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--accent-pink); color: white; border: none; border-radius: 12px; cursor: pointer;">
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+    } finally {
+        btn.innerHTML = 'Search Now';
+        btn.disabled = false;
+    }
+}
+
+// Aadhar Family Info Lookup
+async function performAadharLookup() {
+    const credits = state.profile ? state.profile.credits : state.anonCredits;
+    const isAnon = !state.user;
+
+    if (credits < 50) {
+        if (isAnon) {
+            alert("You need 50 coins to search. Please sign up to get coins.");
+            showAuth('signup', false);
+        } else {
+            alert("You need 50 coins to search. Please buy more coins.");
+            state.currentTab = 'profile'; 
+            renderTab();
+        }
+        return;
+    }
+
+    const aadhar = document.getElementById('aadhar-field').value;
+    if(!aadhar || aadhar.length !== 12) {
+        console.log('Invalid aadhar number');
+        return;
+    }
+
+    const btn = document.getElementById('aadhar-btn');
+    btn.innerHTML = 'Searching...';
+    btn.disabled = true;
+
+    // Get or create results area - insert into app-content which is always visible
+    const appContent = document.getElementById('app-content');
+    let resultsArea = document.getElementById('results-area');
+    
+    if (resultsArea) {
+        resultsArea.remove(); // Remove old one
+    }
+    
+    resultsArea = document.createElement('div');
+    resultsArea.id = 'results-area';
+    resultsArea.style.marginTop = '1rem';
+    resultsArea.style.display = 'block';
+    resultsArea.style.width = '100%';
+    resultsArea.style.visibility = 'visible';
+    resultsArea.style.opacity = '1';
+    resultsArea.style.position = 'relative';
+    resultsArea.style.zIndex = '1000';
+    
+    // Insert at the end of app-content
+    if (appContent) {
+        appContent.appendChild(resultsArea);
+    } else {
+        // Fallback to body if app-content not found
+        document.body.appendChild(resultsArea);
+    }
+    
+    // Show loading message
+    resultsArea.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: var(--text-muted); background: white; border-radius: 16px; border: 2px solid #ff2d85;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">⏳</div>
+            <p style="font-weight: 600; color: #ff2d85;">Fetching Aadhar information...</p>
+            <p style="font-size: 0.8rem; margin-top: 0.5rem;">Please wait</p>
+        </div>
+    `;
+
+    console.log('Starting Aadhar lookup for:', aadhar);
+
+    try {
+        const apiUrl = `api-proxy.php?type=aadhar&aadhar=${aadhar}`;
+        console.log('API URL:', apiUrl);
+        
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            console.warn('API response not OK:', response.status);
+            // Don't throw error, try to parse anyway
+        }
+        
+        const data = await response.json().catch(() => ({}));
+        console.log('API Response:', data);
+
+        // Check for success in various formats
+        console.log('Checking data format:', data);
+        const hasData = data.data || data.result || data.records || data.info || data.results || (typeof data === 'object' && Object.keys(data).length > 0);
+        const isSuccess = data.status === 'success' || data.success === true || data.status === true || data.status === 'OK' || hasData;
+        console.log('hasData:', hasData, 'isSuccess:', isSuccess);
+
+        if (isSuccess && hasData) {
+            // Deduct credit
+            await deductCredit();
+            
+            // Display results inline instead of redirecting
+            displayResults(data, aadhar, 'aadhar');
+            return;
+        } else {
+            // No data - show friendly message without error alert
+            console.log('No data found for this Aadhar number');
+            const errorMsg = data.message || 'No results found for this Aadhar number.';
+            
+            // Try to show in results area without alert
+            let tab = document.querySelector('.tab-view.active') || document.querySelector('.tab-view');
+            if (tab) {
+                let resultsArea = tab.querySelector('#aadhar-results-area');
+                if (!resultsArea) {
+                    resultsArea = document.createElement('div');
+                    resultsArea.id = 'aadhar-results-area';
+                    resultsArea.style.marginTop = '1rem';
+                    tab.appendChild(resultsArea);
+                }
+                resultsArea.innerHTML = `
+                    <div class="ios-card result-card animate-ios" style="margin-top: 2rem;">
+                        <div style="text-align: center; color: var(--text-muted);">
+                            <i data-lucide="search-x" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
+                            <p>No results found</p>
+                            <p style="font-size: 0.8rem; margin-top: 0.5rem;">${errorMsg}</p>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+            }
+        }
+    } catch (error) {
+        console.error('Search Error:', error);
+        // Show error in results area without alert
+        let tab = document.querySelector('.tab-view.active') || document.querySelector('.tab-view');
+        if (tab) {
+            let resultsArea = tab.querySelector('#aadhar-results-area');
+            if (!resultsArea) {
+                resultsArea = document.createElement('div');
+                resultsArea.id = 'aadhar-results-area';
+                resultsArea.style.marginTop = '1rem';
+                tab.appendChild(resultsArea);
+            }
+            resultsArea.innerHTML = `
+                <div class="ios-card result-card animate-ios" style="margin-top: 2rem;">
+                    <div style="text-align: center; color: var(--text-muted);">
+                        <i data-lucide="wifi-off" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
+                        <p>Unable to fetch data. Please try again later.</p>
+                        <button class="primary-btn-ios mt-2" onclick="this.closest('.ios-card').remove();">Close</button>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+    } finally {
+        btn.innerHTML = '<i data-lucide="search" style="width: 18px; height: 18px; margin-right: 0.5rem;"></i>Search Now';
+        btn.disabled = false;
+        lucide.createIcons();
+    }
+}
+
+// Vehicle Information Lookup
+async function performVehicleLookup() {
+    const credits = state.profile ? state.profile.credits : state.anonCredits;
+    const isAnon = !state.user;
+
+    if (credits < 50) {
+        if (isAnon) {
+            alert("You need 50 coins to search. Please sign up to get coins.");
+            showAuth('signup', false);
+        } else {
+            alert("You need 50 coins to search. Please buy more coins.");
+            state.currentTab = 'profile'; 
+            renderTab();
+        }
+        return;
+    }
+
+    const vehicle = document.getElementById('vehicle-field').value;
+    if(!vehicle) {
+        console.log('No vehicle number entered');
+        return;
+    }
+
+    const btn = document.getElementById('vehicle-btn');
+    btn.innerHTML = 'Searching...';
+    btn.disabled = true;
+
+    // Get or create results area - insert into app-content which is always visible
+    const appContent = document.getElementById('app-content');
+    let resultsArea = document.getElementById('results-area');
+    
+    if (resultsArea) {
+        resultsArea.remove(); // Remove old one
+    }
+    
+    resultsArea = document.createElement('div');
+    resultsArea.id = 'results-area';
+    resultsArea.style.marginTop = '1rem';
+    resultsArea.style.display = 'block';
+    resultsArea.style.width = '100%';
+    resultsArea.style.visibility = 'visible';
+    resultsArea.style.opacity = '1';
+    resultsArea.style.position = 'relative';
+    resultsArea.style.zIndex = '1000';
+    
+    // Insert at the end of app-content
+    if (appContent) {
+        appContent.appendChild(resultsArea);
+    } else {
+        // Fallback to body if app-content not found
+        document.body.appendChild(resultsArea);
+    }
+    
+    // Show loading message
+    resultsArea.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: var(--text-muted); background: white; border-radius: 16px; border: 2px solid #ff2d85;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">⏳</div>
+            <p style="font-weight: 600; color: #ff2d85;">Fetching vehicle information...</p>
+            <p style="font-size: 0.8rem; margin-top: 0.5rem;">Please wait</p>
+        </div>
+    `;
+
+    console.log('Starting vehicle lookup for:', vehicle);
+
+    try {
+        const apiUrl = `api-proxy.php?type=vehicle&vehicle=${encodeURIComponent(vehicle)}`;
+        console.log('API URL:', apiUrl);
+        
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        console.log('Response status:', response.status);
+        
+        const data = await response.json().catch((e) => {
+            console.error('Failed to parse JSON:', e);
+            return {};
+        });
+        console.log('Full API Response:', JSON.stringify(data, null, 2));
+        
+        // Check for data in various formats
+        const hasData = data.data || data.result || data.records || data.info || data.results || (typeof data === 'object' && Object.keys(data).length > 0);
+        const isSuccess = data.status === 'success' || data.success === true || data.status === true || data.status === 'OK' || hasData;
+        
+        console.log('Has data:', hasData, 'Is success:', isSuccess);
+
+        if (isSuccess && hasData) {
+            // Deduct credit
+            await deductCredit();
+            
+            // Display results inline instead of redirecting
+            try {
+                displayResults(data, vehicle, 'vehicle');
+            } catch (e) {
+                console.error('displayResults failed:', e);
+                // Fallback: show raw data
+                resultsArea.innerHTML = `
+                    <div class="ios-card" style="margin-top: 1rem; padding: 1rem; border: 2px solid #ff2d85;">
+                        <h3 style="color: #ff2d85; margin-bottom: 1rem;">🚗 Vehicle Search Results</h3>
+                        <pre style="background: #f5f5f5; padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.8rem;">${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            }
+            return;
+        } else {
+            console.error('API Error - No data:', data);
+            const errorMsg = data.message || data.error || 'No results found for this vehicle number.';
+            
+            resultsArea.innerHTML = `
+                <div class="ios-card result-card animate-ios" style="margin-top: 2rem;">
+                    <div style="text-align: center; color: var(--text-muted);">
+                        <i data-lucide="search-x" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
+                        <p>No results found</p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">${errorMsg}</p>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+    } catch (error) {
+        console.error('Search Error:', error);
+        resultsArea.innerHTML = `
+            <div class="ios-card result-card animate-ios" style="margin-top: 2rem; border-left: 4px solid #ff3b30;">
+                <div style="text-align: center; color: var(--text-muted);">
+                    <i data-lucide="alert-circle" style="width: 48px; height: 48px; color: #ff3b30; margin-bottom: 1rem;"></i>
+                    <p style="color: var(--text-main); font-weight: 600;">Error Occurred</p>
+                    <p style="font-size: 0.8rem; margin-top: 0.5rem;">${error.message || 'Failed to fetch data'}</p>
+                    <button onclick="performVehicleLookup()" style="margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--accent-pink); color: white; border: none; border-radius: 12px; cursor: pointer;">
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        `;
+        lucide.createIcons();
+    } finally {
+        btn.innerHTML = '<i data-lucide="search" style="width: 18px; height: 18px; margin-right: 0.5rem;"></i>Search Now';
+        btn.disabled = false;
+        lucide.createIcons();
+    }
+}
+
+// Attach menu listeners
+document.getElementById('menu-buy-coins').onclick = () => {
+    closeMenu();
+    openPaymentModal();
+};
+
+const menuMyAccount = document.getElementById('menu-my-account');
+if (menuMyAccount) {
+    menuMyAccount.onclick = () => {
+        closeMenu();
+        const profileTab = document.querySelector('.nav-tab[data-tab="profile"]');
+        if (profileTab) profileTab.click();
+    };
+}
+
+// Contact Us Logic (Support Chat)
+const contactModal = document.getElementById('contact-modal');
+const menuContactUs = document.getElementById('menu-contact-us');
+const closeContact = document.getElementById('close-contact');
+const submitContact = document.getElementById('submit-contact');
+const chatHistory = document.getElementById('chat-history');
+
+if (menuContactUs) {
+    menuContactUs.onclick = () => {
+        closeMenu();
+        if (!state.user) {
+            alert("Please log in to use Support Chat.");
+            return showAuth('login');
+        }
+        contactModal.classList.add('active');
+        loadChatHistory();
+        lucide.createIcons();
+    };
+}
+
+if (closeContact) {
+    closeContact.onclick = () => {
+        contactModal.classList.remove('active');
+    };
+}
+
+async function loadChatHistory() {
+    if (!state.user) return;
+    
+    let localHistory = JSON.parse(localStorage.getItem('chat_history_' + state.user.id) || '[]');
+    let finalData = localHistory;
+    
+    try {
+        const { data, error } = await sb.from('support_messages').select('*').eq('user_id', state.user.id).order('created_at', { ascending: true });
+        
+        if (!error && data && data.length > 0) {
+            finalData = data;
+            localStorage.setItem('chat_history_' + state.user.id, JSON.stringify(data));
+        } else if (error) {
+            console.warn("DB Chat error, using local fallback", error);
+        }
+    } catch(e) {
+        console.warn("Network error, using local fallback", e);
+    }
+    
+    if (finalData.length === 0) {
+        chatHistory.innerHTML = '<p class="text-muted" style="text-align:center; font-size:0.85rem; margin-top:1rem;">Welcome! Send us a message.</p>';
+        return;
+    }
+
+    let html = '';
+    finalData.forEach(msg => {
+        const isUser = !msg.is_admin;
+        html += `
+            <div style="display: flex; flex-direction: column; align-items: ${isUser ? 'flex-end' : 'flex-start'}; width: 100%;">
+                <div style="max-width: 80%; padding: 0.6rem 1rem; border-radius: 15px; font-size: 0.95rem; margin-bottom: 0.2rem;
+                    ${isUser ? 'background: var(--accent-pink); color: white; border-bottom-right-radius: 0;' : 'background: var(--bg-secondary); color: var(--text-primary); border-bottom-left-radius: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05);'}">
+                    ${msg.message.replace(/</g, "&lt;")}
+                </div>
+                <span style="font-size: 0.7rem; color: var(--text-muted); padding: 0 0.5rem;">${new Date(msg.created_at || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+        `;
+    });
+    chatHistory.innerHTML = html;
+    chatHistory.scrollTop = chatHistory.scrollHeight; // Auto scroll to bottom
+}
+
+const msgInput = document.getElementById('contact-msg');
+if (msgInput) {
+    msgInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if(submitContact) submitContact.click();
+        }
+    });
+}
+
+if (submitContact) {
+    submitContact.onclick = async () => {
+        const text = msgInput.value.trim();
+
+        if (!text || !state.user) return;
+
+        submitContact.disabled = true;
+        msgInput.disabled = true;
+
+        try {
+            // Save to localStorage immediately so it never deletes
+            let localKey = 'chat_history_' + state.user.id;
+            let localHistory = JSON.parse(localStorage.getItem(localKey) || '[]');
+            localHistory.push({ message: text, is_admin: false, created_at: new Date().toISOString() });
+            localStorage.setItem(localKey, JSON.stringify(localHistory));
+
+            // Sync with backend
+            const { error } = await sb.from('support_messages').insert({
+                user_id: state.user.id,
+                message: text,
+                is_admin: false
+            });
+            
+            if (error) console.warn("Supabase backup failed. Saved locally.", error);
+            
+            msgInput.value = '';
+            await loadChatHistory();
+        } catch (e) {
+            console.error("Chat send error:", e);
+        } finally {
+            submitContact.disabled = false;
+            msgInput.disabled = false;
+            msgInput.focus();
+        }
+    };
+}
+
+// Notifications Logic
+const notifyBtn = document.getElementById('notify-btn');
+const notificationsModal = document.getElementById('notifications-modal');
+const closeNotifications = document.getElementById('close-notifications');
+const notifContainer = document.getElementById('notifications-container');
+
+if (notifyBtn) {
+    notifyBtn.onclick = async () => {
+        if (!state.user) {
+            notifContainer.innerHTML = `<p class="text-muted" style="text-align:center; margin-top:2rem;">Please <span style="color:var(--accent-pink); font-weight:700; cursor:pointer;" onclick="document.getElementById('close-notifications').click(); showAuth('login');">log in</span> to see notifications.</p>`;
+            notificationsModal.classList.add('active');
+            return;
+        }
+
+        notificationsModal.classList.add('active');
+        notifContainer.innerHTML = '<p class="text-muted" style="text-align:center; margin-top:2rem;">Loading...</p>';
+
+        try {
+            const { data, error } = await sb.from('payment_requests').select('*').eq('user_id', state.user.id).order('created_at', { ascending: false });
+            
+            if (error) throw error;
+
+            if (!data || data.length === 0) {
+                notifContainer.innerHTML = '<div style="text-align:center; padding: 2rem;"><i data-lucide="bell-off" style="width:40px; height:40px; color:var(--border-color); margin-bottom:1rem;"></i><p class="text-muted">No notifications yet.</p></div>';
+                lucide.createIcons();
+                return;
+            }
+
+            let html = '';
+            data.forEach(req => {
+                const status = req.status || 'pending';
+                let color = 'var(--text-muted)';
+                let icon = 'clock';
+                if (status === 'approved') { color = '#10b981'; icon = 'check-circle'; }
+                if (status === 'rejected') { color = '#ff3b30'; icon = 'x-circle'; }
+
+                html += `
+                    <div class="ios-card animate-ios" style="margin-bottom: 0.8rem; padding: 1rem; border-left: 4px solid ${color};">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div style="display:flex; align-items:center; gap: 0.5rem;">
+                                <i data-lucide="${icon}" style="color:${color}; width:20px; height:20px;"></i>
+                                <span style="font-weight:700;">Payment ${status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                            </div>
+                            <span style="font-weight:800;">₹${req.amount}</span>
+                        </div>
+                        <p class="text-muted" style="margin-top:0.5rem; font-size:0.85rem;">UTR: ${req.utr_number}</p>
+                    </div>
+                `;
+            });
+            notifContainer.innerHTML = html;
+            lucide.createIcons();
+        } catch (err) {
+            console.error(err);
+            notifContainer.innerHTML = '<p style="text-align:center; color:#ff3b30; margin-top:2rem;">Failed to load notifications.</p>';
+        }
+    };
+}
+
+if (closeNotifications) {
+    closeNotifications.onclick = () => notificationsModal.classList.remove('active');
+}
+
+// --- Initialization ---
+darkModeBtn.onclick = () => {
+    state.theme = state.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', state.theme);
+    localStorage.setItem('theme', state.theme);
+};
+
+document.getElementById('do-signup').onclick = handleSignup;
+document.getElementById('do-login').onclick = handleLogin;
+
+setTimeout(() => {
+    splashScreen.style.opacity = '0';
+    setTimeout(() => {
+        splashScreen.classList.remove('active');
+        mainScreen.classList.add('active');
+        checkUser(); // No longer forces signup
+    }, 600);
+}, 3000);
+
+// Store results globally to ensure they persist
+window.lastSearchResults = null;
+window.lastSearchType = null;
+
+// Function to ensure results are displayed
+function ensureResultsDisplayed() {
+    if (!window.lastSearchResults) return;
+    
+    // Find the active tab
+    let activeTab = document.querySelector('.tab-view.active') || 
+                    document.querySelector('.tab-view[data-tab="lookup"]') ||
+                    document.getElementById('app-content');
+    
+    if (!activeTab) return;
+    
+    // Check if results are already displayed
+    const existingResults = document.getElementById('persistent-results-area');
+    if (existingResults && document.contains(existingResults)) {
+        return; // Already displayed
+    }
+    
+    // Re-display results
+    let resultsArea = document.createElement('div');
+    resultsArea.id = 'persistent-results-area';
+    resultsArea.style.marginTop = '1rem';
+    resultsArea.innerHTML = window.lastSearchResults;
+    
+    const backButton = activeTab.querySelector('.ios-card[onclick*="home"]');
+    if (backButton) {
+        activeTab.insertBefore(resultsArea, backButton);
+    } else {
+        activeTab.appendChild(resultsArea);
+    }
+    lucide.createIcons();
+    console.log('Results re-displayed via ensureResultsDisplayed');
+}
+
+// Function to format data as a nice table
+function formatDataAsTable(data, type) {
+    // Extract the actual data object
+    let info = data.data || data.result || data.records || data.info || data.results || data;
+    
+    // If data is nested, try to find the first object with actual fields
+    if (typeof info === 'object' && info !== null) {
+        const keys = Object.keys(info);
+        // If first value is an object, use that (common in APIs)
+        if (keys.length > 0 && typeof info[keys[0]] === 'object' && info[keys[0]] !== null) {
+            info = info[keys[0]];
+        }
+    }
+    
+    if (!info || typeof info !== 'object') {
+        return '<div style="padding: 1rem;">No data available</div>';
+    }
+    
+    // Build table rows for each field
+    let rows = '';
+    for (const [key, value] of Object.entries(info)) {
+        // Format the value
+        let displayValue = value;
+        if (value === null || value === undefined) {
+            displayValue = '<span style="color: #999;">-</span>';
+        } else if (typeof value === 'object') {
+            displayValue = JSON.stringify(value);
+        }
+        
+        // Format key name (capitalize first letter, replace underscores with spaces)
+        const formattedKey = key
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, l => l.toUpperCase());
+        
+        rows += `
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px 16px; font-weight: 600; color: #ff2d85; width: 40%; background: #fff5f8;">${formattedKey}</td>
+                <td style="padding: 12px 16px; color: #333; word-break: break-word;">${displayValue}</td>
+            </tr>
+        `;
+    }
+    
+    return `
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+            <thead>
+                <tr style="background: #ff2d85; color: white;">
+                    <th style="padding: 14px 16px; text-align: left; font-weight: 600;">Field</th>
+                    <th style="padding: 14px 16px; text-align: left; font-weight: 600;">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rows}
+            </tbody>
+        </table>
+    `;
+}
+
+// Function to display results inline
+function displayResults(data, query, type) {
+    console.log('displayResults called with:', { query, type, data });
+    
+    // Get app-content which is always visible
+    const appContent = document.getElementById('app-content');
+    if (!appContent) {
+        console.error('app-content not found');
+        return;
+    }
+    console.log('app-content found:', appContent);
+    
+    // Remove existing results area if any
+    let existingResults = document.getElementById('results-area');
+    if (existingResults) {
+        existingResults.remove();
+    }
+    
+    // Create new results area with visible styles
+    const resultsArea = document.createElement('div');
+    resultsArea.id = 'results-area';
+    resultsArea.style.marginTop = '1rem';
+    resultsArea.style.display = 'block';
+    resultsArea.style.width = '100%';
+    resultsArea.style.visibility = 'visible';
+    resultsArea.style.opacity = '1';
+    resultsArea.style.position = 'relative';
+    resultsArea.style.zIndex = '1000';
+    
+    // Insert into app-content at the end
+    appContent.appendChild(resultsArea);
+    console.log('Inserted into app-content');
+    
+    console.log('resultsArea created and inserted');
+    
+    // Format data as nice table
+    const tableHTML = formatDataAsTable(data, type);
+    
+    // Add highlight animation style
+    resultsArea.innerHTML = `
+        <div id="results-card" style="margin-top: 1rem; padding: 1.5rem; background: white; border: 3px solid #ff2d85; border-radius: 16px; box-shadow: 0 4px 20px rgba(255,45,133,0.3); display: block; visibility: visible; opacity: 1; animation: highlightPulse 2s ease-in-out;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <span style="font-size: 24px;">📄</span>
+                <span style="font-weight: 700; color: #ff2d85; font-size: 1.2rem;">${type === 'phone' ? '📱 Phone' : '🆔 Aadhar'} Search Results</span>
+            </div>
+            <div style="background: var(--bg-secondary); border-radius: 16px; overflow-x: auto; border: 1px solid var(--border-color);">
+                ${tableHTML}
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem; text-align: center;">
+                <span style="font-size: 12px;">✅</span> All information displayed
+            </p>
+        </div>
+    `;
+    
+    // Add highlight animation style if not already added
+    if (!document.getElementById('highlight-animation')) {
+        const style = document.createElement('style');
+        style.id = 'highlight-animation';
+        style.innerHTML = `
+            @keyframes highlightPulse {
+                0% { box-shadow: 0 4px 20px rgba(255,45,133,0.3); border-color: #ff2d85; }
+                25% { box-shadow: 0 0 30px rgba(255,45,133,0.8); border-color: #ff6b9d; transform: scale(1.02); }
+                50% { box-shadow: 0 0 40px rgba(255,45,133,1); border-color: #ff9ec4; transform: scale(1.05); }
+                75% { box-shadow: 0 0 30px rgba(255,45,133,0.8); border-color: #ff6b9d; transform: scale(1.02); }
+                100% { box-shadow: 0 4px 20px rgba(255,45,133,0.3); border-color: #ff2d85; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Auto-scroll to results so user can see them without scrolling
+    setTimeout(() => {
+        const resultsCard = document.getElementById('results-card');
+        if (resultsCard) {
+            resultsCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, 100);
+    
+    console.log('Results HTML set, checking if visible...');
+    console.log('resultsArea parent:', resultsArea.parentNode);
+    console.log('resultsArea offsetHeight:', resultsArea.offsetHeight);
+}
+
+// Function to format JSON with syntax highlighting
+function formatJSON(obj, indent = 0) {
+    const spaces = '  '.repeat(indent);
+    const nextIndent = '  '.repeat(indent + 1);
+    
+    if (obj === null) return '<span style="color: #6b7280; font-style: italic;">null</span>';
+    if (typeof obj === 'boolean') return `<span style="color: #f59e0b; font-weight: 600;">${obj}</span>`;
+    if (typeof obj === 'number') return `<span style="color: #3b82f6;">${obj}</span>`;
+    if (typeof obj === 'string') return `<span style="color: #10b981;">"${obj.replace(/"/g, '&quot;')}"</span>`;
+    
+    if (Array.isArray(obj)) {
+        if (obj.length === 0) return '<span style="color: var(--text-main); font-weight: 600;">[]</span>';
+        let html = '<span style="color: var(--text-main); font-weight: 600;">[</span>\n';
+        obj.forEach((item, i) => {
+            html += nextIndent + formatJSON(item, indent + 1);
+            if (i < obj.length - 1) html += ',';
+            html += '\n';
+        });
+        html += spaces + '<span style="color: var(--text-main); font-weight: 600;">]</span>';
+        return html;
+    }
+    
+    if (typeof obj === 'object') {
+        const keys = Object.keys(obj);
+        if (keys.length === 0) return '<span style="color: var(--text-main); font-weight: 600;">{}</span>';
+        
+        // Fields to exclude
+        const excludedFields = ['owner', 'OWNER', 'name', 'NAME', 'user', 'USER'];
+        
+        let html = '<span style="color: var(--text-main); font-weight: 600;">{</span>\n';
+        
+        keys.forEach((key, i) => {
+            const isExcluded = excludedFields.includes(key) || excludedFields.includes(key.toLowerCase());
+            const value = obj[key];
+            
+            if (isExcluded) {
+                html += nextIndent + `<span style="color: #ff2d85; font-weight: 600;">"${key}"</span>: <span style="color: #6b7280; text-decoration: line-through; font-style: italic;">[hidden]</span>`;
+            } else {
+                html += nextIndent + `<span style="color: #ff2d85; font-weight: 600;">"${key}"</span>: ${formatJSON(value, indent + 1)}`;
+            }
+            
+            if (i < keys.length - 1) html += ',';
+            html += '\n';
+        });
+        
+        html += spaces + '<span style="color: var(--text-main); font-weight: 600;">}</span>';
+        return html;
+    }
+    
+    return String(obj);
+}
+
+// Update search button - direct search without ads
+document.addEventListener('DOMContentLoaded', () => {
+    const lookupBtn = document.getElementById('lookup-btn');
+    if (lookupBtn) {
+        lookupBtn.onclick = performLookup;
+    }
+});
+    </script>
+    
+    <script>
+// Show specific tool view
+function showTool(toolType) {
+    const appContent = document.getElementById('app-content');
+    let credits = state.profile ? state.profile.credits : state.anonCredits;
+    if (isNaN(credits)) credits = 0;
+    
+    switch(toolType) {
+        case 'phone':
+            appContent.innerHTML = `
+                <div class="tab-view animate-ios">
+                    <div class="ios-card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, #FF4DA3 0%, #FF6B9D 100%); color: white;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="phone" style="color: white; width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 1.2rem;">Phone Tracker</h3>
+                                <p style="margin: 0; opacity: 0.9; font-size: 0.85rem;">Real-time Location</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ios-card stat-box" style="margin-bottom: 1.5rem;">
+                        <h4 style="font-size:2rem">${credits}</h4>
+                        <span style="font-weight:600; color:var(--accent-pink)">COINS AVAILABLE</span>
+                    </div>
+                    <div class="ios-card" style="margin-top:1rem;">
+                        <h4 class="input-header" style="margin-top:0">Enter Mobile Number</h4>
+                        <div class="ios-input-group">
+                            <i data-lucide="phone"></i>
+                            <input type="number" placeholder="Enter number..." id="lookup-field">
+                        </div>
+                        <button class="primary-btn-ios" id="lookup-btn" style="margin-top:1rem;">
+                            <i data-lucide="search" style="width: 18px; height: 18px; margin-right: 0.5rem;"></i>
+                            Search Now
+                        </button>
+                    </div>
+                    <div id="results-area"></div>
+                    <button class="ios-card" onclick="state.currentTab='home'; renderTab();" style="width:100%; margin-top:1rem; text-align:center; background:var(--bg-secondary); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+                        <i data-lucide="arrow-left" style="width:18px; height:18px;"></i>
+                        Back to Tools
+                    </button>
+                </div>
+            `;
+            document.getElementById('lookup-btn').onclick = performLookup;
+            break;
+        case 'email':
+            appContent.innerHTML = `
+                <div class="tab-view animate-ios">
+                    <div class="ios-card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%); color: white;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; fill: white;">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 1.2rem;">Aadhar to Family Info</h3>
+                                <p style="margin: 0; opacity: 0.9; font-size: 0.85rem;">Family Details Lookup</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ios-card stat-box" style="margin-bottom: 1.5rem;">
+                        <h4 style="font-size:2rem">${credits}</h4>
+                        <span style="font-weight:600; color:var(--accent-pink)">COINS AVAILABLE</span>
+                    </div>
+                    <div class="ios-card" style="margin-top:1rem;">
+                        <h4 class="input-header" style="margin-top:0">Enter Aadhar Number</h4>
+                        <div class="ios-input-group">
+                            <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; color: var(--text-muted); min-width: 20px;">
+                                <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                            </svg>
+                            <input type="number" placeholder="Enter 12 digit Aadhar..." id="aadhar-field" maxlength="12">
+                        </div>
+                        <button class="primary-btn-ios" id="aadhar-btn" style="margin-top:1rem;">
+                            <i data-lucide="search" style="width: 18px; height: 18px; margin-right: 0.5rem;"></i>
+                            Search Now
+                        </button>
+                    </div>
+                    <div id="aadhar-results-area"></div>
+                    <button class="ios-card" onclick="state.currentTab='home'; renderTab();" style="width:100%; margin-top:1rem; text-align:center; background:var(--bg-secondary); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+                        <i data-lucide="arrow-left" style="width:18px; height:18px;"></i>
+                        Back to Tools
+                    </button>
+                </div>
+            `;
+            document.getElementById('aadhar-btn').onclick = performAadharLookup;
+            break;
+        case 'social':
+            appContent.innerHTML = `
+                <div class="tab-view animate-ios">
+                    <div class="ios-card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, #FF3B30 0%, #FF6B6B 100%); color: white;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="car" style="color: white; width: 28px; height: 28px;"></i>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 1.2rem;">Vehicle Information</h3>
+                                <p style="margin: 0; opacity: 0.9; font-size: 0.85rem;">RC Details Lookup</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ios-card stat-box" style="margin-bottom: 1.5rem;">
+                        <h4 style="font-size:2rem">${credits}</h4>
+                        <span style="font-weight:600; color:var(--accent-pink)">COINS AVAILABLE</span>
+                    </div>
+                    <div class="ios-card" style="margin-top:1rem;">
+                        <h4 class="input-header" style="margin-top:0">Enter Vehicle Number</h4>
+                        <div class="ios-input-group">
+                            <i data-lucide="car" style="color: #FF3B30;"></i>
+                            <input type="text" placeholder="e.g. MH01AB1234" id="vehicle-field" style="text-transform:uppercase;">
+                        </div>
+                        <button class="primary-btn-ios" id="vehicle-btn" style="margin-top:1rem; background: linear-gradient(135deg, #FF3B30 0%, #FF6B6B 100%);">
+                            <i data-lucide="search" style="width: 18px; height: 18px; margin-right: 0.5rem;"></i>
+                            Search Now
+                        </button>
+                    </div>
+                    <div id="vehicle-results-area"></div>
+                    <button class="ios-card" onclick="state.currentTab='home'; renderTab();" style="width:100%; margin-top:1rem; text-align:center; background:var(--bg-secondary); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+                        <i data-lucide="arrow-left" style="width:18px; height:18px;"></i>
+                        Back to Tools
+                    </button>
+                </div>
+            `;
+            document.getElementById('vehicle-btn').onclick = performVehicleLookup;
+            break;
+        case 'report':
+            appContent.innerHTML = `
+                <div class="tab-view animate-ios">
+                    <div class="ios-card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, #10B981 0%, #34D399 100%); color: white;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="file-text" style="color: white; width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 1.2rem;">Full Report</h3>
+                                <p style="margin: 0; opacity: 0.9; font-size: 0.85rem;">PDF Export</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ios-card stat-box" style="margin-bottom: 1.5rem;">
+                        <h4 style="font-size:2rem">${credits}</h4>
+                        <span style="font-weight:600; color:var(--accent-pink)">COINS AVAILABLE</span>
+                    </div>
+                    <div class="ios-card" style="text-align: center; padding: 3rem 1rem;">
+                        <i data-lucide="construction" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                        <h4 style="color: var(--text-muted);">Coming Soon</h4>
+                        <p class="text-muted">Full report feature will be available soon.</p>
+                    </div>
+                    <button class="ios-card" onclick="state.currentTab='home'; renderTab();" style="width:100%; margin-top:1rem; text-align:center; background:var(--bg-secondary); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+                        <i data-lucide="arrow-left" style="width:18px; height:18px;"></i>
+                        Back to Tools
+                    </button>
+                </div>
+            `;
+            break;
+    }
+    lucide.createIcons();
+}
+    </script>
+</body>
+</html>
